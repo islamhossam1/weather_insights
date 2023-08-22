@@ -1,0 +1,43 @@
+version: 2.1
+
+commands:
+  install_flutter:
+    description: "Install Flutter"
+    steps:
+      - run:
+          name: Install Flutter
+          command: |
+            cd ~
+            git clone https://github.com/flutter/flutter.git -b stable
+            echo 'export PATH="$PATH:`pwd`/flutter/bin"' >> $BASH_ENV
+            source $BASH_ENV
+            flutter doctor
+  build_android:
+    description: "Build Android app"
+    steps:
+      - run:
+          name: Build Android
+          command: flutter build apk
+  build_ios:
+    description: "Build iOS app"
+    steps:
+      - run:
+          name: Build iOS
+          command: flutter build ios --release --no-codesign
+
+jobs:
+  build:
+    docker:
+      - image: cirrusci/flutter:latest
+    steps:
+      - checkout
+      - install_flutter
+      - build_android
+      - build_ios
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
+
